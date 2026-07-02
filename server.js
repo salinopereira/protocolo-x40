@@ -92,14 +92,20 @@ app.get("/openapi.json", (req, res) => {
     info: {
       title: "API de Dados de CNPJ",
       description: "Consulta de dados públicos de CNPJ via ReceitaWS com proteção x402.",
-      version: "1.0.0"
+      version: "1.0.0",
+      // Adicionando o contato solicitado pelo scan
+      contact: {
+        email: "reabilitesi@gmail.com" // TROQUE PELO SEU E-MAIL REAL
+      }
     },
     servers: [
       {
         url: "https://protocolo-x40.onrender.com"
       }
     ],
-    // Adicionamos a definição de segurança x402 aqui
+    // Dica: para o favicon, basta colocar um arquivo chamado 'favicon.ico' 
+    // na pasta que o seu Express serve arquivos estáticos (geralmente uma pasta /public).
+    // O x402scan irá buscar em https://protocolo-x40.onrender.com/favicon.ico
     components: {
       securitySchemes: {
         x402: {
@@ -112,20 +118,18 @@ app.get("/openapi.json", (req, res) => {
       "/cnpj/{numero}": {
         "get": {
           "summary": "Obter dados da empresa",
-          "security": [{ x402: [] }], // Isso diz ao scanner que é um endpoint pago
+          "security": [{ x402: [] }],
           "parameters": [
             {
               "name": "numero",
               "in": "path",
               "required": true,
               "description": "CNPJ com 14 dígitos.",
-              "schema": {
-                "type": "string"
-              }
+              "schema": { "type": "string" }
             }
           ],
           "responses": {
-            "200": { "description": "OK" },
+            "200": { "description": "Dados da empresa encontrados" },
             "402": { "description": "Pagamento Requerido (x402)" }
           }
         }
@@ -133,7 +137,6 @@ app.get("/openapi.json", (req, res) => {
     }
   });
 });
-
 // ---------------------------------------------------------------------------
 // Endpoint pago: GET /cnpj/:numero
 // ---------------------------------------------------------------------------
