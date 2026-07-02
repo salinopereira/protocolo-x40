@@ -12,18 +12,9 @@ const { ExactEvmScheme } = require("@x402/evm/exact/server");
 // ---------------------------------------------------------------------------
 
 const PORT = process.env.PORT || 10000;
-
-// Sua carteira Base que vai receber os pagamentos em USDC.
 const PAY_TO_ADDRESS = process.env.PAY_TO_ADDRESS || "0xb1DF24c41607d6cC8b34a47f8b4E4F4A3bCe4533";
-
-// CORREÇÃO: Facilitador público alternativo que suporta a Base Mainnet 
-// sem precisar de chaves de API.
 const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://facilitator.payai.network";
-
-// Preço cobrado por consulta (formato aceito pelo x402: string em dólares).
 const PRICE_PER_QUERY = process.env.PRICE_PER_QUERY || "$0.05";
-
-// CAIP-2 da rede Base mainnet (chain ID 8453).
 const BASE_NETWORK = "eip155:8453";
 
 if (!/^0x[a-fA-F0-9]{40}$/.test(PAY_TO_ADDRESS)) {
@@ -62,8 +53,8 @@ app.use(
         accepts: [
           {
             scheme: "exact",
-            price: PRICE_PER_QUERY, // $0.05 USDC por consulta
-            network: BASE_NETWORK,  // Base mainnet (chain ID 8453)
+            price: PRICE_PER_QUERY, 
+            network: BASE_NETWORK,  
             payTo: PAY_TO_ADDRESS,
           },
         ],
@@ -76,7 +67,7 @@ app.use(
 );
 
 // ---------------------------------------------------------------------------
-// Endpoint público (não-pago) de saúde/status
+// Endpoints Públicos
 // ---------------------------------------------------------------------------
 
 app.get("/", (req, res) => {
@@ -94,10 +85,52 @@ app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
+// DOCUMENTO OPENAPI PARA OS AGENTES DE IA (x402scan)
+app.get("/openapi.json", (req, res) => {
+  res.json({
+    openapi: "3.1.0",
+    info: {
+      title: "API de Dados de CNPJ",
+      description: "Retorna o cadastro da empresa na Receita Federal a partir do CNPJ.",
+      version: "1.0.0"
+    },
+    servers: [
+      {
+        url: "https://protocolo-x40.onrender.com"
+      }
+    ],
+    paths: {
+      "/cnpj/{numero}": {
+        "get": {
+          "summary": "Obter dados da empresa",
+          "description": "Consulta dados oficiais do CNPJ.",
+          "parameters": [
+            {
+              "name": "numero",
+              "in": "path",
+              "required": true,
+              "description": "CNPJ da empresa (14 dígitos, somente números ou com formatação).",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Dados da empresa em JSON."
+            },
+            "402": {
+              "description": "Pagamento x402 obrigatório (0.05 USDC na rede Base)."
+            }
+          }
+        }
+      }
+    }
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Endpoint pago: GET /cnpj/:numero
-// Este handler só é executado depois que o pagamento x402 for validado
-// pelo middleware acima.
 // ---------------------------------------------------------------------------
 
 app.get("/cnpj/:numero", async (req, res) => {
@@ -117,8 +150,6 @@ app.get("/cnpj/:numero", async (req, res) => {
       headers: { Accept: "application/json" },
     });
 
-    // A ReceitaWS retorna 200 mesmo em alguns casos de erro de negócio
-    // (ex: CNPJ inexistente), então checamos o campo "status" do corpo.
     const dados = await respostaReceita.json();
 
     if (!respostaReceita.ok) {
