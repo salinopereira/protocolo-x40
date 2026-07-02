@@ -11,13 +11,14 @@ const { ExactEvmScheme } = require("@x402/evm/exact/server");
 // Configuração
 // ---------------------------------------------------------------------------
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Sua carteira Base que vai receber os pagamentos em USDC.
 const PAY_TO_ADDRESS = process.env.PAY_TO_ADDRESS || "0xb1DF24c41607d6cC8b34a47f8b4E4F4A3bCe4533";
 
-// URL do facilitator responsável por verificar/liquidar os pagamentos on-chain.
-const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://x402.org/facilitator";
+// CORREÇÃO: Facilitador público alternativo que suporta a Base Mainnet 
+// sem precisar de chaves de API.
+const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://facilitator.payai.network";
 
 // Preço cobrado por consulta (formato aceito pelo x402: string em dólares).
 const PRICE_PER_QUERY = process.env.PRICE_PER_QUERY || "$0.05";
@@ -62,7 +63,7 @@ app.use(
           {
             scheme: "exact",
             price: PRICE_PER_QUERY, // $0.05 USDC por consulta
-            network: BASE_NETWORK, // Base mainnet (chain ID 8453)
+            network: BASE_NETWORK,  // Base mainnet (chain ID 8453)
             payTo: PAY_TO_ADDRESS,
           },
         ],
