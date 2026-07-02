@@ -1,0 +1,22 @@
+{
+  "name": "cnpj-x402-server",
+  "version": "1.0.0",
+  "description": "API paga (x402/USDC na rede Base) para consulta de dados de CNPJ via ReceitaWS",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "@x402/express": "^2.11.0",
+    "@x402/core": "^2.11.0",
+    "@x402/evm": "^2.11.0"
+  }
+}
