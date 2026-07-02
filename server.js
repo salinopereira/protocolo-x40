@@ -91,7 +91,7 @@ app.get("/openapi.json", (req, res) => {
     openapi: "3.1.0",
     info: {
       title: "API de Dados de CNPJ",
-      description: "Retorna o cadastro da empresa na Receita Federal a partir do CNPJ.",
+      description: "Consulta de dados públicos de CNPJ via ReceitaWS com proteção x402.",
       version: "1.0.0"
     },
     servers: [
@@ -99,29 +99,34 @@ app.get("/openapi.json", (req, res) => {
         url: "https://protocolo-x40.onrender.com"
       }
     ],
+    // Adicionamos a definição de segurança x402 aqui
+    components: {
+      securitySchemes: {
+        x402: {
+          type: "http",
+          scheme: "x402"
+        }
+      }
+    },
     paths: {
       "/cnpj/{numero}": {
         "get": {
           "summary": "Obter dados da empresa",
-          "description": "Consulta dados oficiais do CNPJ.",
+          "security": [{ x402: [] }], // Isso diz ao scanner que é um endpoint pago
           "parameters": [
             {
               "name": "numero",
               "in": "path",
               "required": true,
-              "description": "CNPJ da empresa (14 dígitos, somente números ou com formatação).",
+              "description": "CNPJ com 14 dígitos.",
               "schema": {
                 "type": "string"
               }
             }
           ],
           "responses": {
-            "200": {
-              "description": "Dados da empresa em JSON."
-            },
-            "402": {
-              "description": "Pagamento x402 obrigatório (0.05 USDC na rede Base)."
-            }
+            "200": { "description": "OK" },
+            "402": { "description": "Pagamento Requerido (x402)" }
           }
         }
       }
