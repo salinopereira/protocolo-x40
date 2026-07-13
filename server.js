@@ -31,6 +31,14 @@ if (!/^0x[a-fA-F0-9]{40}$/.test(PAY_TO_ADDRESS)) {
 // App
 // ---------------------------------------------------------------------------
 
+const facilitatorClient = new HTTPFacilitatorClient({ 
+  url: FACILITATOR_URL,
+  headers: {
+    // Verifique na documentação da Coinbase o formato exato esperado.
+    // Geralmente é algo parecido com isto:
+    "Authorization": `Bearer ${process.env.CDP_API_KEY}` 
+  }
+});
 const app = express();
 app.use(express.json());
 app.use(
