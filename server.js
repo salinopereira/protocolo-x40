@@ -44,10 +44,17 @@ app.use(
 // Configuração do x402 (paywall)
 // ---------------------------------------------------------------------------
 
+// 1. Crie uma string combinando o ID e o Segredo separados por dois pontos
+const cdpCredentials = `${process.env.CDP_API_KEY_ID}:${process.env.CDP_API_SECRET}`;
+
+// 2. Converta para o formato Base64 exigido pelo protocolo Basic Auth
+const cdpAuthBase64 = Buffer.from(cdpCredentials).toString("base64");
+
+// 3. Inicialize o cliente injetando o header de autorização
 const facilitatorClient = new HTTPFacilitatorClient({ 
   url: FACILITATOR_URL,
   headers: {
-    "Authorization": `Bearer ${process.env.CDP_API_KEY}` 
+    "Authorization": `Basic ${cdpAuthBase64}` 
   }
 });
 
