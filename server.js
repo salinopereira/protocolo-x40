@@ -13,7 +13,7 @@ const { ExactEvmScheme } = require("@x402/evm/exact/server");
 
 const PORT = process.env.PORT || 10000;
 const PAY_TO_ADDRESS = process.env.PAY_TO_ADDRESS || "0xb1DF24c41607d6cC8b34a47f8b4E4F4A3bCe4533";
-const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || "https://facilitator.payai.network";
+const FACILITATOR_URL = process.env.X402_FACILITATOR_URL || 'https://api.cdp.coinbase.com/platform/v2/x402';
 const PRICE_PER_QUERY = process.env.PRICE_PER_QUERY || "$0.05";
 const PRICE_COPA = process.env.PRICE_COPA || "$0.50";
 const BASE_NETWORK = "eip155:8453";
